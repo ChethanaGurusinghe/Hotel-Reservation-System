@@ -1,4 +1,4 @@
-package controller;
+package controller.roomController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
