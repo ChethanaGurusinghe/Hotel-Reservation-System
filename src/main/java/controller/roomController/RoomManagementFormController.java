@@ -15,6 +15,11 @@ import java.util.ResourceBundle;
 
 public class RoomManagementFormController implements Initializable {
 
+    RoomManagementService roomManagementService = new RoomManagementController();
+    RoomManagementController roomManagementController = new RoomManagementController();
+
+    public RadioButton radioAvailable;
+    public RadioButton radioUnavailable;
     @FXML
     private Button btnRoomAdd, btnRoomClear, btnRoomDelete, btnRoomUpdate;
 
@@ -42,65 +47,29 @@ public class RoomManagementFormController implements Initializable {
     @FXML
     private TextField txtFloor, txtMaxGuests, txtPricePerNight, txtRoomId;
 
-    // ---------------- Database Connection ----------------
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/hotel_reservation_system", "root", "1234"
-        );
-    }
-
     // ---------------- Load Rooms ----------------
     private void loadRoomDetails() {
-        ObservableList<RoomDetails> rooms = FXCollections.observableArrayList();
+        RoomManagementController roomManagementController1 = new RoomManagementController();
+        ObservableList<RoomDetails> rooms = roomManagementController.getAllRoomDetails();
 
-        try (Connection con = getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM rooms")) {
-
-            while (rs.next()) {
-                rooms.add(new RoomDetails(
-                        rs.getString("room_id"),
-                        rs.getString("type"),
-                        rs.getDouble("price_per_night"),
-                        rs.getInt("max_guests"),
-                        rs.getBoolean("availability"),
-                        rs.getString("description"),
-                        rs.getInt("floor")
-                ));
-            }
-
-            tblRomManagement.setItems(rooms);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        tblRomManagement.setItems(rooms);
     }
 
     // ---------------- Add Room ----------------
     @FXML
     void btnRoomAddOnAction(ActionEvent event) {
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO rooms (room_id, type, price_per_night, max_guests, availability, description, floor) VALUES (?, ?, ?, ?, ?, ?, ?)"
-             )) {
 
-            ps.setString(1, txtRoomId.getText());
-            ps.setString(2, comboType.getValue());
-            ps.setDouble(3, Double.parseDouble(txtPricePerNight.getText()));
-            ps.setInt(4, Integer.parseInt(txtMaxGuests.getText()));
-            ps.setBoolean(5, true); // default availability = true
-            ps.setString(6, txtDescription.getText());
-            ps.setInt(7, Integer.parseInt(txtFloor.getText()));
+        String roomId = txtRoomId.getText();
+        String type = colType.getText();
+        Double pricePerNight = Double.valueOf(txtPricePerNight.getText());
+        Integer maxGuests = Integer.valueOf(txtMaxGuests.getText());
+        Boolean availability =radioAvailable.isSelected();
+        String description = txtDescription.getText();
+        Integer floor = Integer.valueOf(txtFloor.getText());
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                loadRoomDetails();
-                clearFields();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        roomManagementService.addRoomDetails(roomId,type,pricePerNight,maxGuests,availability,description,floor);
+        loadRoomDetails();
+        clearFields();
     }
 
     // ---------------- Clear Fields ----------------
@@ -121,47 +90,29 @@ public class RoomManagementFormController implements Initializable {
     // ---------------- Delete Room ----------------
     @FXML
     void btnRoomDeleteOnAction(ActionEvent event) {
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement("DELETE FROM rooms WHERE room_id=?")) {
 
-            ps.setString(1, txtRoomId.getText());
+        String roomId = txtRoomId.getText();
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                loadRoomDetails();
-                clearFields();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        roomManagementService.deleteRoomDetails(roomId);
+        loadRoomDetails();
+        clearFields();
     }
 
     // ---------------- Update Room ----------------
     @FXML
     void btnRoomUpdateOnAction(ActionEvent event) {
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "UPDATE rooms SET type=?, price_per_night=?, max_guests=?, availability=?, description=?, floor=? WHERE room_id=?"
-             )) {
 
-            ps.setString(1, comboType.getValue());
-            ps.setDouble(2, Double.parseDouble(txtPricePerNight.getText()));
-            ps.setInt(3, Integer.parseInt(txtMaxGuests.getText()));
-            ps.setBoolean(4, true); // can later make dynamic
-            ps.setString(5, txtDescription.getText());
-            ps.setInt(6, Integer.parseInt(txtFloor.getText()));
-            ps.setString(7, txtRoomId.getText());
+        String roomId = txtRoomId.getText();
+        String type = comboType.getValue();
+        Double pricePerNight = Double.valueOf(txtPricePerNight.getText());
+        Integer maxGuests = Integer.valueOf(txtMaxGuests.getText());
+        Boolean availability = radioAvailable.isSelected();
+        String description = txtDescription.getText();
+        Integer floor = Integer.valueOf(txtFloor.getText());
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                loadRoomDetails();
-                clearFields();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        roomManagementService.updateRoomDetails(type,pricePerNight,maxGuests,availability,description,floor,roomId);
+        loadRoomDetails();
+        clearFields();
     }
 
     // ---------------- Row Click Event ----------------
@@ -176,6 +127,13 @@ public class RoomManagementFormController implements Initializable {
                     txtMaxGuests.setText(String.valueOf(selected.getMaxGuests()));
                     txtDescription.setText(selected.getDescription());
                     txtFloor.setText(String.valueOf(selected.getFloor()));
+
+                    if (Boolean.TRUE.equals(selected.getAvailability())) {
+                        radioAvailable.setSelected(true);
+                    } else {
+                        radioUnavailable.setSelected(true);
+                    }
+
                 }
             }
         });
@@ -194,7 +152,16 @@ public class RoomManagementFormController implements Initializable {
 
         comboType.setItems(FXCollections.observableArrayList("Single", "Double", "Suite", "Deluxe"));
 
+        ToggleGroup availabilityGroup = new ToggleGroup();
+        radioAvailable.setToggleGroup(availabilityGroup);
+        radioUnavailable.setToggleGroup(availabilityGroup);
+
+        radioAvailable.setSelected(true);
+
         loadRoomDetails();
         setRowClickEvent();
     }
+
+
+
 }

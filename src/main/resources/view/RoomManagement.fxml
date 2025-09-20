@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -74,32 +75,39 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <TextArea fx:id="txtDescription" layoutX="437.0" layoutY="410.0" prefHeight="130.0" prefWidth="374.0" />
-      <Label layoutX="374.0" layoutY="567.0" prefHeight="24.0" prefWidth="95.0" text="Floor">
+      <TextArea fx:id="txtDescription" layoutX="437.0" layoutY="410.0" prefHeight="106.0" prefWidth="374.0" />
+      <Label layoutX="375.0" layoutY="542.0" prefHeight="24.0" prefWidth="44.0" text="Floor">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="txtFloor" layoutX="437.0" layoutY="566.0" prefHeight="26.0" prefWidth="131.0" />
-      <Button fx:id="btnRoomAdd" layoutX="139.0" layoutY="617.0" mnemonicParsing="false" onAction="#btnRoomAddOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #E91E63;" text="ADD">
+      <TextField fx:id="txtFloor" layoutX="437.0" layoutY="540.0" prefHeight="26.0" prefWidth="131.0" />
+      <Button fx:id="btnRoomAdd" layoutX="160.0" layoutY="634.0" mnemonicParsing="false" onAction="#btnRoomAddOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #E91E63;" text="ADD">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="btnRoomUpdate" layoutX="305.0" layoutY="617.0" mnemonicParsing="false" onAction="#btnRoomUpdateOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #76FF03;" text="UPDATE">
+      <Button fx:id="btnRoomUpdate" layoutX="315.0" layoutY="634.0" mnemonicParsing="false" onAction="#btnRoomUpdateOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #76FF03;" text="UPDATE">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="btnRoomDelete" layoutX="459.0" layoutY="617.0" mnemonicParsing="false" onAction="#btnRoomDeleteOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #D500F9;" text="DELETE">
+      <Button fx:id="btnRoomDelete" layoutX="469.0" layoutY="634.0" mnemonicParsing="false" onAction="#btnRoomDeleteOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #D500F9;" text="DELETE">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="btnRoomClear" layoutX="616.0" layoutY="617.0" mnemonicParsing="false" onAction="#btnRoomClearOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #FF6F00;" text="CLEAR">
+      <Button fx:id="btnRoomClear" layoutX="616.0" layoutY="634.0" mnemonicParsing="false" onAction="#btnRoomClearOnAction" prefHeight="34.0" prefWidth="88.0" style="-fx-background-color: #FF6F00;" text="CLEAR">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
+      <Label layoutX="608.0" layoutY="542.0" prefHeight="24.0" prefWidth="69.0" text="Availability">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <RadioButton fx:id="radioAvailable" layoutX="696.0" layoutY="545.0" mnemonicParsing="false" text="Available" />
+      <RadioButton fx:id="radioUnavailable" layoutX="696.0" layoutY="570.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="88.0" text="Unavailable" />
    </children>
 </AnchorPane>
