@@ -15,6 +15,9 @@ import java.util.ResourceBundle;
 
 public class CustomerManagementFormController implements Initializable {
 
+    CustomerManagementController customerManagementController = new CustomerManagementController();
+    CustomerManagementService customerManagementService = new CustomerManagementController();
+
     @FXML
     private Button btnCustomerAdd;
 
@@ -66,63 +69,29 @@ public class CustomerManagementFormController implements Initializable {
     @FXML
     private TextField txtPhoneNumber;
 
-    // ---------------- Database Connection ----------------
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/hotel_reservation_system", "root", "1234"
-        );
-    }
-
     // ---------------- Load Customers ----------------
     private void loadCustomerDetails() {
-        ObservableList<CustomerDetails> customers = FXCollections.observableArrayList();
 
-        try (Connection con = getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM Customer")) {
+        CustomerManagementController customerManagementController = new CustomerManagementController();
+        ObservableList<CustomerDetails> customers = customerManagementController.gettAllCustomerDetails();
 
-            while (rs.next()) {
-                customers.add(new CustomerDetails(
-                        rs.getString("CustID"),
-                        rs.getString("CustName"),
-                        rs.getString("Email"),
-                        rs.getString("PhoneNo"),
-                        rs.getString("CustAddress"),
-                        rs.getInt("NumberOfGuests")
-                ));
-            }
-
-            tblCustomerManagement.setItems(customers);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        tblCustomerManagement.setItems(customers);
     }
 
     // ---------------- Add Customer ----------------
     @FXML
     void btnCustomerAddOnAction(ActionEvent event) {
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO Customer (CustID, CustName, Email, PhoneNo, CustAddress, NumberOfGuests) VALUES (?, ?, ?, ?, ?, ?)"
-             )) {
 
-            ps.setString(1, txtCustomerId.getText());
-            ps.setString(2, txtName.getText());
-            ps.setString(3, txtEmail.getText());
-            ps.setString(4, txtPhoneNumber.getText());
-            ps.setString(5, txtAddress.getText());
-            ps.setInt(6, comboNumberOfGuests.getValue());
+        String customerId = txtCustomerId.getText();
+        String customerName = txtName.getText();
+        String email = txtEmail.getText();
+        String phoneNO = txtPhoneNumber.getText();
+        String address = txtAddress.getText();
+        Integer numberOfGuests = comboNumberOfGuests.getValue();
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                loadCustomerDetails();
-                clearFields();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        customerManagementService.addCustomerDetails(customerId,customerName,email,phoneNO,address,numberOfGuests);
+        loadCustomerDetails();
+        clearFields();
     }
 
     // ---------------- Clear Fields ----------------
@@ -143,46 +112,29 @@ public class CustomerManagementFormController implements Initializable {
     // ---------------- Delete Customer ----------------
     @FXML
     void btnCustomerDeleteOnAction(ActionEvent event) {
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement("DELETE FROM Customer WHERE CustID=?")) {
 
-            ps.setString(1, txtCustomerId.getText());
+        String customerId = txtCustomerId.getText();
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                loadCustomerDetails();
-                clearFields();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        customerManagementService.deleteCustomerDetails(customerId);
+        loadCustomerDetails();
+        clearFields();
     }
 
     // ---------------- Update Customer ----------------
     @FXML
     void btnCustomerUpdateOnAction(ActionEvent event) {
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                     "UPDATE Customer SET CustName=?, Email=?, PhoneNo=?, CustAddress=?, NumberOfGuests=? WHERE CustID=?"
-             )) {
 
-            ps.setString(1, txtName.getText());
-            ps.setString(2, txtEmail.getText());
-            ps.setString(3, txtPhoneNumber.getText());
-            ps.setString(4, txtAddress.getText());
-            ps.setInt(5, comboNumberOfGuests.getValue());
-            ps.setString(6, txtCustomerId.getText());
+        String customerName = txtName.getText();
+        String email = txtEmail.getText();
+        String phoneNo = txtPhoneNumber.getText();
+        String address = txtAddress.getText();
+        Integer numberOfGuests = comboNumberOfGuests.getValue();
+        String customerId = txtCustomerId.getText();
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                loadCustomerDetails();
-                clearFields();
-            }
+        customerManagementService.updateCustomerDetails(customerName,email,phoneNo,address,numberOfGuests,customerId);
+        loadCustomerDetails();
+        clearFields();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     // ---------------- Row Click Event ----------------
